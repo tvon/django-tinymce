@@ -39,11 +39,25 @@ class Format(models.Model):
     classes = models.CharField(max_length=50, blank=True, help_text='Space separated list of classes to apply the the selected elements or the new inline/block element.')
 
     enabled = models.BooleanField()
-    position = models.PositiveIntegerField(unique=True)
+    position = models.PositiveIntegerField(null=True)
+
+    class Meta:
+        ordering = ('position',)
 
     def __unicode__(self):
         return self.title
         
+    def save(self, *args, **kwargs):
+
+        if self.position is None:
+            try:
+                last = Format.objects.order_by('-position')[0]
+                self.position = last.position + 1
+            except IndexError:
+                self.position = 0
+
+        return super(Format, self).save(*args, **kwargs)
+
     def as_config(self):
         result = {}
         result['title'] = self.title
