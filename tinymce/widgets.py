@@ -65,6 +65,11 @@ class TinyMCE(forms.Textarea):
         mce_config['mode'] = 'exact'
         mce_config['elements'] = final_attrs['id']
         mce_config['strict_loading_mode'] = 1
+        
+        mce_config['style_formats'] = []
+        for format in tinymce.models.Format.objects.filter(enabled=True):
+            mce_config['style_formats'].append(format.as_config())
+        
         mce_json = simplejson.dumps(mce_config)
 
         html = [u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))]
